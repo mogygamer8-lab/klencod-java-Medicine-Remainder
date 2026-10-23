@@ -1,0 +1,43 @@
+
+package com.mortada.medicinereminder;
+
+import android.app.*;
+import android.content.*;
+import android.os.Build;
+
+public class ReminderReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+
+        String name = intent.getStringExtra("name");
+        String dose = intent.getStringExtra("dose");
+        int id = intent.getIntExtra("id", 100);
+
+        if (name == null) name = "الدواء";
+        if (dose == null) dose = "";
+
+        Notification.Builder builder;
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            builder = new Notification.Builder(
+                context, "medicine_channel"
+            );
+        } else {
+            builder = new Notification.Builder(context);
+        }
+
+        builder.setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("💊 حان موعد الدواء")
+            .setContentText(name + " - " + dose)
+            .setPriority(Notification.PRIORITY_HIGH)
+            .setAutoCancel(true);
+
+        NotificationManager manager =
+            (NotificationManager) context.getSystemService(
+                Context.NOTIFICATION_SERVICE
+            );
+
+        manager.notify(id, builder.build());
+    }
+}
